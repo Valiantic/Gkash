@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Send, 
   Smartphone, 
@@ -29,6 +29,36 @@ const MenuItem = ({ icon: Icon, label, isNew }) => (
 );
 
 const Dashboard = () => {
+  const [balance, setBalance] = useState(50);
+  const [countdown, setCountdown] = useState(7);
+  const [isIncreasing, setIsIncreasing] = useState(false);
+
+  useEffect(() => {
+    let countdownTimer;
+    if (countdown > 0) {
+      countdownTimer = setInterval(() => {
+        setCountdown(prev => prev - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      setIsIncreasing(true);
+      clearInterval(countdownTimer);
+    }
+
+    return () => clearInterval(countdownTimer);
+  }, [countdown]);
+
+  useEffect(() => {
+    // Continuous balance increase after countdown
+    let increaseTimer;
+    if (isIncreasing) {
+      increaseTimer = setInterval(() => {
+        setBalance(prev => prev + 10);
+      }, 40); // Increases every 100ms
+    }
+
+    return () => clearInterval(increaseTimer);
+  }, [isIncreasing]);
+
   const menuItems = [
     { icon: Send, label: 'Send' },
     { icon: Smartphone, label: 'Load' },
@@ -58,7 +88,7 @@ const Dashboard = () => {
       <div className="bg-blue-600 text-white p-6 rounded-2xl mb-8 flex justify-between items-center">
         <div>
           <div className="text-sm mb-1">AVAILABLE BALANCE</div>
-          <div className="text-3xl font-bold">₱ 33,821.04</div>
+          <div className="text-3xl text-left font-bold">₱ {balance.toFixed(2)}</div>
         </div>
         <button className="bg-white text-blue-600 px-4 py-2 rounded-full font-medium hover:bg-blue-50 transition-colors">
           + Cash In
